@@ -1,3 +1,4 @@
+import os
 import random
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
@@ -8,10 +9,10 @@ from telegram.ext import (
     filters,
 )
 
-# 🔐 TU TOKEN REAL AQUÍ
-TOKEN = "8483595648:AAEaffJHFSlwlFuenv_Z3LOuaM3OvC4a1Uw"
+# 🔐 TOKEN desde Render (variable de entorno)
+TOKEN = os.getenv("8483595648:AAEaffJHFSlwlFuenv_Z3LOuaM3OvC4a1Uw")
 
-# 🎵 LISTA DE RECOMENDACIONES (PUEDES AGREGAR MÁS)
+# 🎵 LISTA DE CANCIONES
 CANCIONES = [
     "Daft Punk - Get Lucky",
     "Coldplay - Viva La Vida",
@@ -25,10 +26,10 @@ CANCIONES = [
 # 📨 MENSAJE BASE
 MENSAJE_BASE = (
     "No estoy disponible por el momento 😅\n"
-    "pero mientras puedes escuchar música en lo que respondo 🎶\n\n"
+    "pero mientras puedes escuchar música en lo que respondo 🎶"
 )
 
-# 🔗 GENERAR LINKS POR PLATAFORMA
+# 🔗 GENERAR BOTONES
 def generar_botones(cancion):
     query = cancion.replace(" ", "%20")
 
@@ -40,23 +41,25 @@ def generar_botones(cancion):
         [InlineKeyboardButton("⏳ Prefiero esperar", callback_data="esperar")]
     ])
 
-# 📥 RESPONDER A CUALQUIER MENSAJE
+# 📥 RESPONDER A TODO (texto, imagen, emoji, etc.)
 async def responder_todo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not update.message:
+        return
+
     cancion = random.choice(CANCIONES)
 
     mensaje = (
-        MENSAJE_BASE +
-        f"🎧 *Recomendación para ti:*\n"
+        f"{MENSAJE_BASE}\n\n"
+        f"🎧 Recomendación para ti:\n"
         f"🎵 {cancion}"
     )
 
     await update.message.reply_text(
         mensaje,
-        reply_markup=generar_botones(cancion),
-        parse_mode="Markdown"
+        reply_markup=generar_botones(cancion)
     )
 
-# 🖱️ BOTÓN ESPERAR
+# 🖱️ BOTÓN "ESPERAR"
 async def botones(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -69,12 +72,13 @@ async def botones(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # 🚀 MAIN
 def main():
+    print("🤖 Bot activo...")
+
     app = ApplicationBuilder().token(TOKEN).build()
 
     app.add_handler(MessageHandler(filters.ALL, responder_todo))
     app.add_handler(CallbackQueryHandler(botones))
 
-    print("🤖 Bot activo...")
     app.run_polling()
 
 if __name__ == "__main__":
