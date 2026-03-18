@@ -1,5 +1,6 @@
 import os
 import random
+import asyncio
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     ApplicationBuilder,
@@ -9,7 +10,7 @@ from telegram.ext import (
     filters,
 )
 
-# 🔐 TOKEN desde Render (variable de entorno)
+# 🔐 TOKEN desde variables de entorno (Render)
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 print("TOKEN:", TOKEN)
 
@@ -42,7 +43,7 @@ def generar_botones(cancion):
         [InlineKeyboardButton("⏳ Prefiero esperar", callback_data="esperar")]
     ])
 
-# 📥 RESPONDER A TODO (texto, imagen, emoji, etc.)
+# 📥 RESPONDER A TODO
 async def responder_todo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.message:
         return
@@ -71,8 +72,9 @@ async def botones(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Cuando esté disponible te respondo. Gracias por tu paciencia 🙌"
         )
 
-# 🚀 MAIN
-def main():
+# 🚀 FUNCIÓN PRINCIPAL
+async def main():
+
     print("🤖 Bot activo...")
 
     app = ApplicationBuilder().token(TOKEN).build()
@@ -80,11 +82,16 @@ def main():
     app.add_handler(MessageHandler(filters.ALL, responder_todo))
     app.add_handler(CallbackQueryHandler(botones))
 
-    import asyncio
+    print("Bot iniciado correctamente")
 
-    async def run():
-        await app.initialize()
-        await app.start()
-        await app.updater.start_polling()
+    await app.initialize()
+    await app.start()
+    await app.updater.start_polling()
 
-    asyncio.run(run())
+    # Mantener el bot vivo
+    while True:
+        await asyncio.sleep(3600)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
