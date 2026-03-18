@@ -10,7 +10,7 @@ from telegram.ext import (
 )
 
 # 🔐 TOKEN desde Render (variable de entorno)
-TOKEN = os.getenv("8483595648:AAGsqJLixqIQ--DephgpTkw77mFhNtRzqP8")
+TOKEN = os.getenv("TELEGRAM_TOKEN")
 print("TOKEN:", TOKEN)
 
 # 🎵 LISTA DE CANCIONES
