@@ -250,7 +250,23 @@ async def main():
 
     while True:
         await asyncio.sleep(3600)
+        
 
 
 if __name__ == "__main__":
     asyncio.run(main())
+    import os
+from flask import Flask
+from threading import Thread
+
+app_flask = Flask(__name__)
+
+@app_flask.route('/')
+def home():
+    return "Bot activo"
+
+def run_web():
+    port = int(os.environ.get("PORT", 10000))
+    app_flask.run(host="0.0.0.0", port=port)
+
+Thread(target=run_web).start()
