@@ -80,7 +80,11 @@ def main():
     app.add_handler(MessageHandler(filters.ALL, responder_todo))
     app.add_handler(CallbackQueryHandler(botones))
 
-    app.run_polling()
+    import asyncio
 
-if __name__ == "__main__":
-    main()
+    async def run():
+        await app.initialize()
+        await app.start()
+        await app.updater.start_polling()
+
+    asyncio.run(run())
